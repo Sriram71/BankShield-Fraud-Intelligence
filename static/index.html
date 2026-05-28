@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GuardRail AI - Multi-Agent Fraud Intelligence</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <!-- Background glow objects for futuristic feel -->
+    <div class="glow-orb orb-1"></div>
+    <div class="glow-orb orb-2"></div>
+    <div class="glow-orb orb-3"></div>
+
+    <div class="app-container">
+        <!-- Top Navigation / Header -->
+        <header class="main-header">
+            <div class="logo-area">
+                <div class="logo-icon">
+                    <i class="fa-solid fa-shield-halved"></i>
+                </div>
+                <div class="logo-text">
+                    <h1>GUARDRAIL <span>AI</span></h1>
+                    <p>Financial Crime & Multi-Agent Fraud Intelligence</p>
+                </div>
+            </div>
+            
+            <div class="header-controls">
+                <div class="api-status-badge" id="apiKeyStatus">
+                    <span class="status-dot dot-inactive"></span>
+                    <span class="status-text">Checking Groq API...</span>
+                </div>
+                <button class="icon-btn" id="openSettingsBtn" title="API Configuration">
+                    <i class="fa-solid fa-sliders"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Dashboard Workspace -->
+        <div class="dashboard-grid">
+            
+            <!-- Left Column: Inputs and Stream Simulator -->
+            <aside class="dashboard-column col-left">
+                <!-- Transaction Form Card -->
+                <div class="glass-card transaction-card">
+                    <div class="card-header">
+                        <i class="fa-solid fa-file-invoice-dollar card-icon"></i>
+                        <h2>New Transaction Audit</h2>
+                    </div>
+                    <form id="transactionForm" class="form-grid">
+                        <div class="input-group">
+                            <label for="customerId">Customer Reference</label>
+                            <div class="input-wrapper">
+                                <i class="fa-solid fa-user"></i>
+                                <input type="text" id="customerId" required placeholder="e.g. CUST_1001" value="CUST_1001">
+                            </div>
+                        </div>
+
+                        <div class="input-group">
+                            <label for="amount">Transaction Amount (USD)</label>
+                            <div class="input-wrapper">
+                                <i class="fa-solid fa-dollar-sign"></i>
+                                <input type="number" id="amount" required min="1" step="0.01" placeholder="e.g. 2500" value="2500">
+                            </div>
+                        </div>
+
+                        <div class="input-group">
+                            <label for="location">Geographical Location</label>
+                            <div class="input-wrapper">
+                                <i class="fa-solid fa-earth-americas"></i>
+                                <select id="location">
+                                    <option value="Nigeria">Nigeria (Watchlist)</option>
+                                    <option value="Russia">Russia (Watchlist)</option>
+                                    <option value="London">London (UK)</option>
+                                    <option value="New York" selected>New York (US)</option>
+                                    <option value="Tokyo">Tokyo (Japan)</option>
+                                    <option value="Unknown">Unknown Proxy</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="input-group">
+                            <label for="deviceId">Device Signature</label>
+                            <div class="input-wrapper">
+                                <i class="fa-solid fa-mobile-screen-button"></i>
+                                <select id="deviceId">
+                                    <option value="VPN_DEVICE">VPN Device (Suspicious)</option>
+                                    <option value="TOR_BROWSER">TOR Browser (Suspicious)</option>
+                                    <option value="MOBILE_APP_123" selected>Verified Mobile App</option>
+                                    <option value="WEB_BROWSER_ABC">Verified Web Browser</option>
+                                    <option value="POS_TERMINAL_XYZ">POS Payment Terminal</option>
+                                    <option value="EMULATOR">Virtual Device Emulator</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="input-group">
+                            <label for="hour">Hour of Transaction (24h)</label>
+                            <div class="input-wrapper">
+                                <i class="fa-solid fa-clock"></i>
+                                <input type="number" id="hour" required min="0" max="23" placeholder="0-23" value="14">
+                            </div>
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="button" class="btn btn-secondary" id="clearFormBtn">Clear</button>
+                            <button type="submit" class="btn btn-primary" id="submitAuditBtn">
+                                <span>Run Audit</span>
+                                <i class="fa-solid fa-wand-magic-sparkles"></i>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Simulation Feed Card -->
+                <div class="glass-card simulation-card">
+                    <div class="card-header">
+                        <i class="fa-solid fa-satellite-dish card-icon"></i>
+                        <h2>Live Stream Simulation</h2>
+                    </div>
+                    <div class="sim-controls">
+                        <p class="sim-description">Simulate high-velocity real-time transactions streaming from mock queues.</p>
+                        
+                        <div class="btn-group">
+                            <button class="btn btn-secondary" id="loadSampleTxBtn" title="Load Next Sample">
+                                <i class="fa-solid fa-step-forward"></i> Load Sample
+                            </button>
+                            <button class="btn btn-primary" id="toggleStreamBtn">
+                                <i class="fa-solid fa-play"></i> Start Stream
+                            </button>
+                        </div>
+
+                        <div class="sim-speed-selector">
+                            <label for="simDelay">Stream Interval:</label>
+                            <select id="simDelay">
+                                <option value="3000">3 Seconds</option>
+                                <option value="5000" selected>5 Seconds</option>
+                                <option value="10000">10 Seconds</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="sim-logs">
+                        <h3>Simulation History</h3>
+                        <div class="logs-container" id="simLogsContainer">
+                            <div class="log-placeholder">No stream transactions processed yet. Click 'Start Stream' or submit an audit.</div>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Middle Column: Agent Graph Pipeline -->
+            <main class="dashboard-column col-middle">
+                <div class="glass-card pipeline-card">
+                    <div class="card-header">
+                        <i class="fa-solid fa-network-wired card-icon"></i>
+                        <h2>LangGraph Orchestration Flow</h2>
+                        <span class="node-execution-status" id="pipelineStatus">Idle</span>
+                    </div>
+
+                    <!-- Flow graph visual container -->
+                    <div class="agent-graph-container" id="graphContainer">
+                        <!-- Node rows defined for logical architecture -->
+                        
+                        <!-- Row 1: Ingest -->
+                        <div class="graph-row row-ingest">
+                            <div class="graph-node-wrapper">
+                                <div class="graph-node active-node" id="node-monitor" data-name="monitor">
+                                    <div class="node-pulse"></div>
+                                    <div class="node-icon"><i class="fa-solid fa-arrow-down-to-bracket"></i></div>
+                                    <div class="node-title">Transaction Monitoring</div>
+                                    <div class="node-badge">Ingest</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="graph-arrow-connector vertical"></div>
+
+                        <!-- Row 2: Standard Assessors -->
+                        <div class="graph-row row-assessors grid-3">
+                            <div class="graph-node-wrapper">
+                                <div class="graph-node" id="node-risk_score" data-name="risk_score">
+                                    <div class="node-pulse"></div>
+                                    <div class="node-icon"><i class="fa-solid fa-percent"></i></div>
+                                    <div class="node-title">Risk Scoring</div>
+                                    <div class="node-val" id="val-risk_score">-</div>
+                                </div>
+                            </div>
+                            <div class="graph-node-wrapper">
+                                <div class="graph-node" id="node-rule_based" data-name="rule_based">
+                                    <div class="node-pulse"></div>
+                                    <div class="node-icon"><i class="fa-solid fa-sliders"></i></div>
+                                    <div class="node-title">Rule Engine</div>
+                                    <div class="node-val" id="val-rule_based">-</div>
+                                </div>
+                            </div>
+                            <div class="graph-node-wrapper">
+                                <div class="graph-node" id="node-ml_agent" data-name="ml_agent">
+                                    <div class="node-pulse"></div>
+                                    <div class="node-icon"><i class="fa-solid fa-brain"></i></div>
+                                    <div class="node-title">ML Fraud Scorer</div>
+                                    <div class="node-val" id="val-ml_agent">-</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="graph-arrow-connector vertical"></div>
+
+                        <!-- Row 3: Environmental Guards -->
+                        <div class="graph-row row-guards grid-3">
+                            <div class="graph-node-wrapper">
+                                <div class="graph-node" id="node-geo_agent" data-name="geo_agent">
+                                    <div class="node-pulse"></div>
+                                    <div class="node-icon"><i class="fa-solid fa-map-pin"></i></div>
+                                    <div class="node-title">Geo Guard</div>
+                                    <div class="node-val" id="val-geo_agent">-</div>
+                                </div>
+                            </div>
+                            <div class="graph-node-wrapper">
+                                <div class="graph-node" id="node-device_agent" data-name="device_agent">
+                                    <div class="node-pulse"></div>
+                                    <div class="node-icon"><i class="fa-solid fa-laptop-code"></i></div>
+                                    <div class="node-title">Device Intel</div>
+                                    <div class="node-val" id="val-device_agent">-</div>
+                                </div>
+                            </div>
+                            <div class="graph-node-wrapper">
+                                <div class="graph-node" id="node-behavior_agent" data-name="behavior_agent">
+                                    <div class="node-pulse"></div>
+                                    <div class="node-icon"><i class="fa-solid fa-clock-rotate-left"></i></div>
+                                    <div class="node-title">Behavior Profiler</div>
+                                    <div class="node-val" id="val-behavior_agent">-</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="graph-arrow-connector vertical"></div>
+
+                        <!-- Row 4: Advanced Cyber Guards -->
+                        <div class="graph-row row-cyber grid-3">
+                            <div class="graph-node-wrapper">
+                                <div class="graph-node" id="node-aml_pattern" data-name="aml_pattern">
+                                    <div class="node-pulse"></div>
+                                    <div class="node-icon"><i class="fa-solid fa-money-bill-transfer"></i></div>
+                                    <div class="node-title">AML Pattern Check</div>
+                                    <div class="node-val" id="val-aml_pattern">-</div>
+                                </div>
+                            </div>
+                            <div class="graph-node-wrapper">
+                                <div class="graph-node" id="node-behavioral_biometrics" data-name="behavioral_biometrics">
+                                    <div class="node-pulse"></div>
+                                    <div class="node-icon"><i class="fa-solid fa-fingerprint"></i></div>
+                                    <div class="node-title">Biometrics Auditor</div>
+                                    <div class="node-val" id="val-behavioral_biometrics">-</div>
+                                </div>
+                            </div>
+                            <div class="graph-node-wrapper">
+                                <div class="graph-node" id="node-geo_velocity" data-name="geo_velocity">
+                                    <div class="node-pulse"></div>
+                                    <div class="node-icon"><i class="fa-solid fa-gauge-high"></i></div>
+                                    <div class="node-title">Geo-Velocity Risk</div>
+                                    <div class="node-val" id="val-geo_velocity">-</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="graph-arrow-connector vertical"></div>
+
+                        <!-- Row 5: Identity and Account Takeover -->
+                        <div class="graph-row row-identity grid-2">
+                            <div class="graph-node-wrapper">
+                                <div class="graph-node" id="node-synthetic_identity" data-name="synthetic_identity">
+                                    <div class="node-pulse"></div>
+                                    <div class="node-icon"><i class="fa-solid fa-id-card-clip"></i></div>
+                                    <div class="node-title">Synthetic ID Det</div>
+                                    <div class="node-val" id="val-synthetic_identity">-</div>
+                                </div>
+                            </div>
+                            <div class="graph-node-wrapper">
+                                <div class="graph-node" id="node-account_takeover" data-name="account_takeover">
+                                    <div class="node-pulse"></div>
+                                    <div class="node-icon"><i class="fa-solid fa-user-shield"></i></div>
+                                    <div class="node-title">ATO Scan</div>
+                                    <div class="node-val" id="val-account_takeover">-</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="graph-arrow-connector vertical"></div>
+
+                        <!-- Row 6: LLM Decision Maker -->
+                        <div class="graph-row row-decision">
+                            <div class="graph-node-wrapper">
+                                <div class="graph-node decision-node" id="node-llm_decision" data-name="llm_decision">
+                                    <div class="node-pulse"></div>
+                                    <div class="node-icon"><i class="fa-solid fa-scale-balanced"></i></div>
+                                    <div class="node-title">LLM Decision Agent</div>
+                                    <div class="node-badge">AI Synthesis</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="graph-arrow-connector vertical"></div>
+
+                        <!-- Row 7: Compliance Reporting -->
+                        <div class="graph-row row-sar">
+                            <div class="graph-node-wrapper">
+                                <div class="graph-node compliance-node" id="node-sar_agent" data-name="sar_agent">
+                                    <div class="node-pulse"></div>
+                                    <div class="node-icon"><i class="fa-solid fa-file-shield"></i></div>
+                                    <div class="node-title">Compliance SAR Gen</div>
+                                    <div class="node-badge">SAR Auditing</div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </main>
+
+            <!-- Right Column: Results Dashboard and SAR Details -->
+            <aside class="dashboard-column col-right">
+                <!-- Verdict Card -->
+                <div class="glass-card verdict-card verdict-pending" id="verdictContainer">
+                    <div class="verdict-glow"></div>
+                    <div class="card-header">
+                        <i class="fa-solid fa-gavel card-icon"></i>
+                        <h2>Analysis Verdict</h2>
+                    </div>
+                    <div class="verdict-body">
+                        <div class="verdict-badge" id="verdictBadge">PENDING AUDIT</div>
+                        <div class="verdict-reasoning-container">
+                            <h3>RATIONALE</h3>
+                            <div class="verdict-reasoning" id="verdictReasoning">
+                                Submit a transaction or start the simulation feed to view the multi-agent decision audit logs.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Metrics & Report Card -->
+                <div class="glass-card details-card">
+                    <div class="tab-header">
+                        <button class="tab-btn active" data-tab="metricsTab">
+                            <i class="fa-solid fa-chart-simple"></i> Analytics
+                        </button>
+                        <button class="tab-btn" data-tab="sarTab" id="sarTabBtn">
+                            <i class="fa-solid fa-file-shield"></i> Compliance Report
+                        </button>
+                    </div>
+
+                    <div class="tab-content" id="metricsTab">
+                        <div class="metrics-grid">
+                            <div class="metric-box">
+                                <span class="metric-label">Risk Index</span>
+                                <div class="metric-meter">
+                                    <div class="meter-fill" id="meter-risk-index" style="width: 0%;"></div>
+                                </div>
+                                <span class="metric-val" id="metric-risk-val">0 / 100</span>
+                            </div>
+
+                            <div class="metric-box">
+                                <span class="metric-label">ML Prob</span>
+                                <div class="metric-meter">
+                                    <div class="meter-fill meter-purple" id="meter-ml-prob" style="width: 0%;"></div>
+                                </div>
+                                <span class="metric-val" id="metric-ml-val">0.00</span>
+                            </div>
+
+                            <div class="metric-box inline">
+                                <div class="metric-icon-box" id="icon-rule-flag">
+                                    <i class="fa-solid fa-circle-exclamation"></i>
+                                </div>
+                                <div class="metric-desc">
+                                    <span class="metric-label">Rule Triggered</span>
+                                    <span class="metric-val-str" id="val-rule-trigger">False</span>
+                                </div>
+                            </div>
+
+                            <div class="metric-box inline">
+                                <div class="metric-icon-box" id="icon-synthetic-flag">
+                                    <i class="fa-solid fa-id-card"></i>
+                                </div>
+                                <div class="metric-desc">
+                                    <span class="metric-label">Synthetic ID Flag</span>
+                                    <span class="metric-val-str" id="val-synthetic-flag">False</span>
+                                </div>
+                            </div>
+
+                            <div class="metric-detail-list">
+                                <div class="detail-row">
+                                    <span>Geo Risk Level:</span>
+                                    <strong id="det-geo-risk">Low</strong>
+                                </div>
+                                <div class="detail-row">
+                                    <span>Device Integrity:</span>
+                                    <strong id="det-device-risk">Low</strong>
+                                </div>
+                                <div class="detail-row">
+                                    <span>Time-of-day Risk:</span>
+                                    <strong id="det-behavior-risk">Low</strong>
+                                </div>
+                                <div class="detail-row">
+                                    <span>AML Code:</span>
+                                    <strong id="det-aml-pattern">None</strong>
+                                </div>
+                                <div class="detail-row">
+                                    <span>Biometrics Deviation:</span>
+                                    <strong id="det-biometrics">Low</strong>
+                                </div>
+                                <div class="detail-row">
+                                    <span>Geo-Velocity Shift:</span>
+                                    <strong id="det-velocity">Low</strong>
+                                </div>
+                                <div class="detail-row">
+                                    <span>ATO Risk Level:</span>
+                                    <strong id="det-ato">Low</strong>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tab-content hidden" id="sarTab">
+                        <div class="sar-report-container">
+                            <pre id="sarReportCode">Suspicious Activity Report has not been generated for this audit session.</pre>
+                        </div>
+                        <button class="btn btn-secondary btn-full" id="copySarBtn" disabled>
+                            <i class="fa-solid fa-copy"></i> Copy SAR Document
+                        </button>
+                    </div>
+                </div>
+            </aside>
+
+        </div>
+    </div>
+
+    <!-- API Settings Modal -->
+    <div class="modal-overlay hidden" id="settingsModal">
+        <div class="glass-card modal-card">
+            <div class="modal-header">
+                <h2>API Key Configuration</h2>
+                <button class="icon-btn" id="closeSettingsBtn"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="modal-body">
+                <p>Provide a Groq API Key to test the live LLM-based agent decisions. If omitted, the system defaults to the key in the project environment or the rule-based heuristic decision engine.</p>
+                <div class="input-group">
+                    <label for="customApiKey">Groq API Key (gsk_...)</label>
+                    <div class="input-wrapper">
+                        <i class="fa-solid fa-key"></i>
+                        <input type="password" id="customApiKey" placeholder="Paste your Groq API Key here">
+                    </div>
+                    <span class="input-help" id="keyConfigHelp">Currently: Reading from Server Env</span>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="clearKeyBtn">Remove Key</button>
+                <button class="btn btn-primary" id="saveKeyBtn">Apply Settings</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/app.js"></script>
+</body>
+</html>
